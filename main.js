@@ -13,22 +13,22 @@ Previous objects contains other objects that we will describe now :
         b) direction : The direction property can contain one of four values: "N", "S", "E", or "W". 
         The rover’s default direction will be "N" (as North).
         c) position : an array of two number which give its position
-        d) tracking : an array whose each element is an array of two number : it represents the histocal of moves of the rover
+        d) tracking : an array whose each element is an array of two number and a direction : it represents the histocal of moves of the rover
         e) commandSet : a string of command which are These commands will be the first letter of either (f)orward, (b)ackward (r)ight, or (l)eft.
     2/ "obstacle". It is an object which contains
-        a) type : There is two kind of obstacle : fixes, and rover obstacle. If the obstacle is a fixed obxtacle, type="fixed", else, 
+        a) a type. There is two kind of obstacle : fixes, and rover obstacle. If the obstacle is a fixed obxtacle, type="fixed", else, 
         type=<rover name>
-        b) position : an array of two number which represent the position of the obstacle
+        b) a position : an array of two number which represent the position of the obstacle
 */
 
-let rover1 = libMove.constructRover('rover1', 'N', [1,1], 'rffff') ;
-let rover2 = libMove.constructRover('rover2', 'N', [1,2], 'rffff') ;
+let rover1 = libMove.constructRover('rover1', 'N', [1,1], 'rffffff') ;
+let rover2 = libMove.constructRover('rover2', 'N', [1,11], 'rbbbbbbbbbb') ;
 roverSet = [rover1, rover2] ;
 
 let obstacleNameSet = ['fixed', 'fixed'] ;
-let obstaclePositionSet = [[1,5], [10,10]] ;
+let obstaclePositionSet = [[2,9], [10,10]] ;
 let obstacleSet = libMove.constructObstacleSet(obstacleNameSet, obstaclePositionSet) ;
-let grid = libMove.constructGrid([10,10], obstacleSet) ;
+let grid = libMove.constructGrid([11,11], obstacleSet) ;
 
 //console.log(grid.obstacleSet) ;
 //console.log(libMove.moveForward(roverSet[0], grid)) ;
