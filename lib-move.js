@@ -37,8 +37,10 @@ exports.constructRover = function(name, direction, position, commandSet) {
         name: name,
         direction: direction,
         position: position,
-        tracking: [[position, direction]],
-        commandSet: commandSet
+        nextPosition: [],
+        tracking: [[position[0], position[1], direction, "ON"]],
+        commandSet: commandSet,
+        status: "ON"
     } ;
 
     return rover ;
@@ -65,14 +67,20 @@ function logTracking(tracking) {
     return textTracking + ' => END';
 }
 
-function isAnObstacle(rover, obstacleSet) {
+function updateTracking(rover) {
+    newTracking = rover.position.slice() ;
+    newTracking.push(rover.direction);
+    newTracking.push(rover.status) ;
+    rover.tracking.push(newTracking) ;
+}
+
+function isAnObstacle(position, obstacleSet) {
     //  given a rover and a set of obstacle, say if the position is in the set of obstacle
     let cpt = 0;
 
     while (
         cpt < obstacleSet.length && 
-        (!areArrayEqual(rover.position, obstacleSet[cpt].position) ||
-        rover.name === obstacleSet[cpt].name))
+        !areArrayEqual(position, obstacleSet[cpt].position))
     {
         cpt++;  
     }
@@ -89,6 +97,7 @@ function turnLeft(rover, printConsoleLog = true) {
     let actualIndexDirection = directionList.indexOf(rover.direction);
     let oldDirection = rover.direction;
     rover.direction = directionList[positivMod(actualIndexDirection-1,4)];
+    rover.nextPosition = rover.position;
     if (printConsoleLog) {
         console.log(`Rover ${rover.name} turn from ${oldDirection} to ${rover.direction}`);
     }
@@ -100,36 +109,39 @@ function turnRight(rover, printConsoleLog = true) {
     let actualIndexDirection = directionList.indexOf(rover.direction);
     let oldDirection = rover.direction;
     rover.direction = directionList[positivMod(actualIndexDirection+1,4)];
+    rover.nextPosition = rover.position;
     if (printConsoleLog) {
         console.log(`Rover ${rover.name} turn from ${oldDirection} to ${rover.direction}`);
     }    
     return(rover);
 } 
 
-function moveForward(rover, grid, printConsoleLog = true) {
+function moveForward(rover) {
     /*  If possible, move forcard a rover. If the rover can't move because of obctacle, call of function keepPosition with parameter
         'stoped' which indicate that the rovers stoped because an obstacle, and no because the rover had no command anymore.
         Print log only if printConsoleLog is true 
     */
-    let newPosition;
+    let nextPosition;
     switch(rover.direction) {
         case 'N': 
-            newPosition = [rover.position[0] + 1, rover.position[1]];
+            nextPosition = [rover.position[0] + 1, rover.position[1]];
             break;
         case 'S': 
-            newPosition = [rover.position[0] - 1, rover.position[1]];
+            nextPosition = [rover.position[0] - 1, rover.position[1]];
             break;
         case 'E': 
-            newPosition = [rover.position[0], rover.position[1] + 1];
+            nextPosition = [rover.position[0], rover.position[1] + 1];
             break;
         case 'O': 
-            newPosition = [rover.position[0], rover.position[1] - 1];
+            nextPosition = [rover.position[0], rover.position[1] - 1];
             break;
         default:
-            newPosition = rover.position;
+            nextPosition = rover.position;
     }
 
-    let oldPosition = rover.position;
+    rover.nextPosition = nextPosition;
+
+   /* let oldPosition = rover.position;
     if (!isAnObstacle({name: rover.name, position:newPosition}, grid.obstacleSet)  &&
     newPosition[0] > 0 && newPosition[0] <= grid.size[0] &&
     newPosition[1] > 0 && newPosition[1] <= grid.size[1]) {
@@ -141,30 +153,19 @@ function moveForward(rover, grid, printConsoleLog = true) {
     } else {
         // if the rover can't move because of an obstacle
         keepPosition(rover,  'STOPED' ,printConsoleLog) ;
-    }
+    } */
 } 
 
-function moveBackward(rover, grid, printConsoleLog = true) {
+function moveBackward(rover) {
     // moving backward is equivalent to change direction to times, then move forward. At the end, one must change direction again
     turnLeft(turnLeft(rover, false), false) ;
-    moveForward(rover, grid, printConsoleLog);
+    moveForward(rover);
     turnLeft(turnLeft(rover, false), false) ;
 } 
 
 
-function keepPosition(rover, reason = "STOPED", printConsoleLog = true) {
-    /*  Function called when the rover don't move, because of an obstacle, or because, it it's command list is finished. If
-        the rover once, we delete its command to indicate that a reover has definitly stoped. Thus, even if it had other command, they 
-        won't be execute
-    */
-    if (printConsoleLog) {
-        if (reason==="STOPED") {
-            console.log(`Rover ${rover.name} can't move : current position = (${rover.position})`);
-        } else {
-            console.log(`Rover ${rover.name} stoped : current position = (${rover.position})`);
-        }
-    }
-    rover.commandSet = []; // when a rover meet an obstacle, it defenitly stop
+function turnOff(rover) {
+   rover.status='OFF' ; 
 }
 
 
@@ -173,52 +174,94 @@ function moveRover(rover, grid, command, printConsoleLog = true) {
         For each move, one complete the rover tracking
     */
 
-    let newTracking ;
-    switch(command) {
-        case 'l':
-            turnLeft(rover, printConsoleLog) ;
-            newTracking = rover.position.slice() ;
-            newTracking.push(rover.direction);
-            rover.tracking.push(newTracking) ;
-            break ;
-        case 'r':
-            turnRight(rover, printConsoleLog) ;
-            newTracking = rover.position.slice() ;
-            newTracking.push(rover.direction);
-            rover.tracking.push(newTracking) ;            
-            break ;
-        case 'f':
-            moveForward(rover, grid, printConsoleLog) ;
-            newTracking = rover.position.slice() ;
-            newTracking.push(rover.direction);
-            rover.tracking.push(newTracking) ;           
-            break ;
-        case 'b':
-            moveBackward(rover, grid, printConsoleLog) ;
-            newTracking = rover.position.slice() ;
-            newTracking.push(rover.direction);
-            rover.tracking.push(newTracking) ;      
-            break ;
-        default:
-            keepPosition(rover, 'END',printConsoleLog) ;
-            newTracking = rover.position.slice() ;
-            newTracking.push(rover.direction);
-            rover.tracking.push("END") ; 
-        }
+    if (rover.status === 'ON') {
+        let newTracking ;
+        switch(command) {
+            case 'l':
+                turnLeft(rover, printConsoleLog) ;
+                break ;
+            case 'r':
+                turnRight(rover, printConsoleLog) ;            
+                break ;
+            case 'f':
+                moveForward(rover) ;      
+                break ;
+            case 'b':
+                moveBackward(rover) ;    
+                break ;
+            case undefined:
+                turnOff(rover) ;
+                console.log(`Rover ${rover.name} command push is finished. Rover turn off. Current position = (${rover.position})`);
+                break ;
+            default:
+                turnOff(rover) ;
+                console.log(`Bad command : Rover ${rover.name} is stoped. Current position = (${rover.position})`);
+         }
+    } else {
+        console.log(`Rover ${rover.name} is OFF. Current position = (${rover.position})`);
+    }
+
 
 } 
+
+function moveRoverSet(rover, roverSet, grid, command) {
+
+    if (rover.status === 'ON' && (command === "f" || command === "b")) {
+        if (rover.nextPosition[0] < 1 || rover.nextPosition[0] > grid.size[0] ||
+            rover.nextPosition[1] < 1 || rover.nextPosition[1] > grid.size[1]) {
+            stopedChainedRover(rover, roverSet) ;
+            console.log(`Rover ${rover.name} stoped because it exceed grid size`);
+        } else if (isAnObstacle(rover.nextPosition, grid.obstacleSet)) {
+            turnOff(rover) ;
+            console.log(`Rover ${rover.name} stoped because it meet an obstacle`);
+        } else {
+            console.log(`Rover ${rover.name} move from (${rover.position}) to (${rover.nextPosition})`);
+            rover.position = rover.nextPosition ;
+        }
+    }
+    updateTracking(rover) ;  
+
+}
+
+function stopedChainedRover(stopedRover, roverSet) {
+
+    console.log(roverSet[0]) ;
+    console.log(roverSet[1]) ;
+
+    let roverToStop = [];
+    roverSet.forEach(rover => {
+        console.log(rover.name) ;
+        console.log(stopedRover.name) ;
+        console.log(rover.nextPosition) ;
+        console.log(stopedRover.position) ;
+console.log(rover.name !== stopedRover.name) ;
+
+        if (rover.name !== stopedRover.name && rover.nextPosition === stopedRover.position) {
+            roverToStop.push(rover) ;
+        }
+    }) ;
+
+    if (roverToStop.length === 0) {
+        console.log("toto") ;
+        turnOff(stopedRover) ;
+    } else {
+        roverToStop.forEach(rover => {stopedChainedRover(rover, roverSet);}) ;
+        console.log("titi") ;
+    }
+}
+
 
 /*  Grid and obstacle function
 
     gather function chich apply to a gris and obstacle
 */
 
-exports.constructObstacleSet = function(nameSet, positionSet) {
+exports.constructObstacleSet = function(positionSet) {
     // constructor of obstacle
     const obstacleSet = [] ;
     
-    for (k=0; k<nameSet.length; k++) {
-        obstacleSet.push({name: nameSet[k], position: positionSet[k]}) ;
+    for (k=0; k<positionSet.length; k++) {
+        obstacleSet.push({position: positionSet[k]}) ;
     }
 
     return obstacleSet;
@@ -295,22 +338,15 @@ exports.moveRoverSet = function(roverSet, grid) {
     const fixedObstacleGrid = getFixedObstacle(grid); 
         // grid with only fixed obstacle which will be enriched each loop with rover obstacle  
     for (k=0 ; k<longestCommandSet ; k++) {
-        console.log(`Move ${k}`) ;
-        let futureRoverSet = copyRoverSet(roverSet);
-            // rover set use to get the rover obstacle position. One use function copyRoverSet because "=" copy by reference 
-        grid.obstacleSet = copyObstacleSet(fixedObstacleGrid.obstacleSet) ;
-            // At this instant, rover obstacle of the grid are not relevant anymore. Only fixed obstacle are still. It will be enriched 
-            // next with update rover obectacle. One use function copyObstacleSet because "=" copy by reference 
-        futureRoverSet.forEach(rover => {
-            moveRover(rover, fixedObstacleGrid, rover.commandSet[k], false) ;
-            grid.obstacleSet.push({name: rover.name, position: rover.position}) ;
-        }) ;
-            // Get new relevant rover obstacle
+        console.log("t = "+k) ;
         roverSet.forEach(rover => {
             moveRover(rover, grid, rover.commandSet[k]) ;
         }) ;
+        roverSet.forEach(rover => {
+            moveRoverSet(rover, roverSet, grid, rover.commandSet[k]) ;
+        }) ;
+
             // Move orver with relevant obstacle
-        
     }
 
     console.log('Rover moves : ') ;

@@ -21,15 +21,17 @@ Previous objects contains other objects that we will describe now :
         b) a position : an array of two number which represent the position of the obstacle
 */
 
-let rover1 = libMove.constructRover('rover1', 'N', [1,1], 'rffffff') ;
-let rover2 = libMove.constructRover('rover2', 'N', [1,11], 'rbbbbbbbbbb') ;
+let rover1 = libMove.constructRover('rover1', 'N', [1,6], 'rffffff') ;
+let rover2 = libMove.constructRover('rover2', 'N', [1,5], 'rfffffff') ;
+let rover3 = libMove.constructRover('rover3', 'N', [1,3], 'rrrr') ;
+
 roverSet = [rover1, rover2] ;
 
-let obstacleNameSet = ['fixed', 'fixed'] ;
-let obstaclePositionSet = [[2,9], [10,10]] ;
-let obstacleSet = libMove.constructObstacleSet(obstacleNameSet, obstaclePositionSet) ;
-let grid = libMove.constructGrid([11,11], obstacleSet) ;
+let obstaclePositionSet = [[1,4], [10,10]] ;
+let obstacleSet = libMove.constructObstacleSet(obstaclePositionSet) ;
+let grid = libMove.constructGrid([8,8], obstacleSet) ;
 
 //console.log(grid.obstacleSet) ;
 //console.log(libMove.moveForward(roverSet[0], grid)) ;
 libMove.moveRoverSet(roverSet, grid) ;
+console.log(rover1)
