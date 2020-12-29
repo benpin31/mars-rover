@@ -51,7 +51,7 @@ function areArrayEqual(arr1, arr2) {
         2/ "obstacle". It is an object which contains a position : an array of two number which represent the position of the obstacle. 
 */
 
-exports.constructRover = function(name, direction, position, commandSet) {
+function constructRover(name, direction, position, commandSet) {
     // constructor of a rover
     let rover = {
         name: name,
@@ -67,7 +67,7 @@ exports.constructRover = function(name, direction, position, commandSet) {
     return rover ;
 } ;
 
-exports.constructObstacleSet = function(positionSet) {
+function constructObstacleSet(positionSet) {
     // constructor of obstacle
     const obstacleSet = [] ;
     
@@ -78,7 +78,7 @@ exports.constructObstacleSet = function(positionSet) {
     return obstacleSet;
 } ;
 
-exports.constructGrid = function(gridSize, obstacleSet) {
+function constructGrid(gridSize, obstacleSet) {
     // constructor of grid
     const grid = {
         size: gridSize,
@@ -257,7 +257,7 @@ function stoppedChainedRover(stoppedRover, roverSet, grid) {
     if (roverToStop.length !== 0) {
         roverToStop.forEach(rover => {
             turnOff(rover, grid) ;
-            console.log(`Rover ${rover.name} stopped because rover ${stoppedRover.name} stopped before it` ) ;
+            console.log(`${rover.name} is chained stopped because of ${stoppedRover.name}` ) ;
             stoppedChainedRover(rover, roverSet, grid); // RULE 4 : always chain stop the rovers
             //recursive part : One have to find rover stopped by the previous stopped rovers.
         }) ;
@@ -282,11 +282,11 @@ function moveRoverSetOneStep(rover, roverSet, grid, command) {
                 // RULE 1
                 turnOff(rover, grid) ;
                 stoppedChainedRover(rover, roverSet, grid) ; // RULE 4 : always chain stop the rovers
-                console.log(`Rover ${rover.name} stopped because it exceed grid size`);
+                console.log(`${rover.name} stopped because it exceed grid size`);
             } else if (nextPositionIsAnObstacle(rover, grid)) {
                 turnOff(rover, grid) ;
                 stoppedChainedRover(rover, roverSet, grid) ; // RULE 4 : always chain stop the rovers
-                console.log(`Rover ${rover.name} stopped because it meet an obstacle`);
+                console.log(`${rover.name} stopped because it meet an obstacle`);
             } else if (getCrashedRover(rover, roverSet).length > 0) {
                 roverToStop = getCrashedRover(rover, roverSet);
                 roverToStop.unshift(rover) ;
@@ -298,12 +298,12 @@ function moveRoverSetOneStep(rover, roverSet, grid, command) {
                     stoppedChainedRover(crashedRover, roverSet, grid) ; // RULE 4 : always chain stop the rovers
                     roverNameList += crashedRover.name + ",";
                 }) ;
-                console.log(`Rover ${roverNameList} stopped because they would have crashed together`);
+                console.log(`${roverNameList} stopped because they would have crashed together`);
             } else {
                 if (['r', 'l'].includes(command)) {
-                    console.log(`Rover ${rover.name} turn from ${rover.direction} to ${rover.nextDirection}`);
+                    console.log(`${rover.name} turn from ${rover.direction} to ${rover.nextDirection}`);
                 } else {
-                    console.log(`Rover ${rover.name} move from (${rover.position}) to (${rover.nextPosition})`);
+                    console.log(`${rover.name} move from (${rover.position}) to (${rover.nextPosition})`);
                 }
                 rover.position = rover.nextPosition ;
                 rover.direction = rover.nextDirection ;
@@ -312,15 +312,15 @@ function moveRoverSetOneStep(rover, roverSet, grid, command) {
             // if there is no more command for the rover, its journey is finished and we stop it
             turnOff(rover, grid) ;
             stoppedChainedRover(rover, roverSet, grid) ; // RULE 4 : always chain stop the rovers
-            console.log(`Rover ${rover.name} command push is finished. Rover turn off. Current position = (${rover.position})`);
+            console.log(`${rover.name} command push is finished. Rover turn off. Current position = (${rover.position})`);
         } else {
             // if the commande is not l, r, f, b or empty, this is a mistake and the rover stop
             turnOff(rover, grid) ;
             stoppedChainedRover(rover, roverSet, grid) ; // RULE 4 : always chain stop the rovers
-            console.log(`Bad command : Rover ${rover.name} is stopped. Current position = (${rover.position})`);
+            console.log(`Bad command : ${rover.name} is stopped. Current position = (${rover.position})`);
         }
     } else {
-        console.log(`Rover ${rover.name} is OFF. Current position = (${rover.position})`);
+        console.log(`${rover.name} is OFF. Current position = (${rover.position})`);
     }
 
     updateTracking(rover) ;  
@@ -369,7 +369,7 @@ function getLongestCommandSet(roverSet) {
 
 } 
 
-exports.moveRoverSet = function(roverSet, grid) {
+function moveRoverSet(roverSet, grid) {
 
     const longestCommandSet = getLongestCommandSet(roverSet) ; 
         // we loop as many time as the longest set of command
@@ -390,4 +390,25 @@ exports.moveRoverSet = function(roverSet, grid) {
     roverSet.forEach(rover => {
         console.log(`${rover.name} tracking : ` + logTracking(rover.tracking)) ;
     }) ;
-} ;
+} 
+
+/* Main */
+
+
+let rover1 = constructRover('rover1', 'N', [3,2], 'rfffff') ;
+let rover2 = constructRover('rover2', 'N', [3,1], 'rfffff') ;
+let rover3 = constructRover('rover3', 'N', [8,10], 'llffff') ;
+let rover4 = constructRover('rover4', 'N', [3,8], 'rfflff') ;
+let rover5 = constructRover('rover5', 'N', [3,6], 'rffflf') ;
+let rover6 = constructRover('rover6', 'N', [3,5], 'rffffl') ;
+
+
+
+roverSet = [rover1, rover2, rover3, rover4, rover5, rover6] ;
+
+let obstaclePositionSet = [ [3,5]] ;
+let obstacleSet = constructObstacleSet(obstaclePositionSet) ;
+let grid = constructGrid([10,10], obstacleSet) ;
+
+moveRoverSet(roverSet, grid) ;
+
