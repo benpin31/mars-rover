@@ -65,7 +65,7 @@ function constructRover(name, direction, position, commandSet) {
     } ;
 
     return rover ;
-} ;
+} 
 
 function constructObstacleSet(positionSet) {
     // constructor of obstacle
@@ -76,7 +76,7 @@ function constructObstacleSet(positionSet) {
     }
 
     return obstacleSet;
-} ;
+} 
 
 function constructGrid(gridSize, obstacleSet) {
     // constructor of grid
@@ -86,7 +86,7 @@ function constructGrid(gridSize, obstacleSet) {
     } ;
     
     return grid ;
-} ;
+} 
 
 
 /*  Move functions
@@ -333,23 +333,31 @@ function moveRoverSetOneStep(rover, roverSet, grid, command) {
         scenario. Each rover has its own command set, and on havec to move (if possible) all the rovers until the last command. 
     */
 
-function logTracking(tracking) {
+function logTracking(roverSet) {
     // print tracking
+    let nbStep = roverSet[0].tracking.length ;
 
-    let textTracking = '' ;
-    for (step = 0; step < tracking.length; step++) {
-        if (step === 0) {
-            textTracking += "(" + tracking[step] + ")" ;
-        } else  {
-            if (step%5 === 4) {
-                textTracking += " \n => (" + tracking[step] + ")" ;
+    let logTrackingText = '\nRovers journey : \n' ;
+    roverSet.forEach(rover => {
+        logTrackingText += '' + rover.name + '\t\t' ;
+    }) ;
+    logTrackingText += '\n' ;
+
+    for (k=0 ; k < nbStep ; k++) {
+        line = '';
+        for (l=0; l < roverSet.length ; l++) {
+            if (l === roverSet.length-1) {
+                line += '(' + roverSet[l].tracking[k] + ')\n' ;
             } else {
-                textTracking += " => (" + tracking[step] + ")" ;
+                line += '(' + roverSet[l].tracking[k] + ')\t|' ;
             }
         }
+        logTrackingText += line ;
     }
 
-    return textTracking + ' => END';
+
+
+    console.log(logTrackingText) ;
 }
 
 function getLongestCommandSet(roverSet) {
@@ -386,29 +394,29 @@ function moveRoverSet(roverSet, grid) {
         // validate or not each moves
     }
 
-    console.log('Rover moves : ') ;
-    roverSet.forEach(rover => {
-        console.log(`${rover.name} tracking : ` + logTracking(rover.tracking)) ;
-    }) ;
+    logTracking(roverSet) ;
 } 
 
 /* Main */
 
 
-let rover1 = constructRover('rover1', 'N', [3,2], 'rfffff') ;
-let rover2 = constructRover('rover2', 'N', [3,1], 'rfffff') ;
+let rover1 = constructRover('rover1', 'N', [15,18], 'rfffff') ;
+let rover2 = constructRover('rover2', 'N', [11,14], 'rfffff') ;
 let rover3 = constructRover('rover3', 'N', [8,10], 'llffff') ;
 let rover4 = constructRover('rover4', 'N', [3,8], 'rfflff') ;
 let rover5 = constructRover('rover5', 'N', [3,6], 'rffflf') ;
 let rover6 = constructRover('rover6', 'N', [3,5], 'rffffl') ;
+let rover7 = constructRover('rover7', 'N', [3,4], 'rfffff') ;
+let rover8 = constructRover('rover8', 'N', [10,2], 'lbb') ;
 
 
 
-roverSet = [rover1, rover2, rover3, rover4, rover5, rover6] ;
 
-let obstaclePositionSet = [ [3,5]] ;
+roverSet = [rover1, rover2, rover3, rover4, rover5, rover6, rover7, rover8] ;
+
+let obstaclePositionSet = [ [11,16]] ;
 let obstacleSet = constructObstacleSet(obstaclePositionSet) ;
-let grid = constructGrid([10,10], obstacleSet) ;
+let grid = constructGrid([20,20], obstacleSet) ;
 
 moveRoverSet(roverSet, grid) ;
 

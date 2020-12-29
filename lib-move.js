@@ -352,6 +352,25 @@ function logTracking(tracking) {
     return textTracking + ' => END';
 }
 
+function logTracking2(roverSet) {
+    let nbStep = roverSet[0].tracking.length ;
+
+    let logTrackingText = '' ;
+    for (k=0 ; k < nbStep ; k++) {
+        line = '';
+        roverSet.forEach(rover => {
+            if (k === nbStep-1) {
+                line += '    ' + rover.tracking[k] + '\n' ;
+            } else {
+                line += '    ' + rover.tracking[k] +     | ;
+            }
+        }) ;
+        logTrackingText += line ;
+    }
+
+    return logTrackingText ;
+}
+
 function getLongestCommandSet(roverSet) {
     /*  If 2 rovers have different commandset length, this function give the longest. Thus, one can continue the journey : 
         the rover with shorter command will have empty command and will stop (function moveRoverSetOneStep)*/
@@ -390,4 +409,6 @@ exports.moveRoverSet = function(roverSet, grid) {
     roverSet.forEach(rover => {
         console.log(`${rover.name} tracking : ` + logTracking(rover.tracking)) ;
     }) ;
+
+    logTracking2(roverSet) ;
 } ;
