@@ -71,7 +71,7 @@ function constructObstacleSet(positionSet) {
     // constructor of obstacle
     const obstacleSet = [] ;
     
-    for (k=0; k<positionSet.length; k++) {
+    for (let k=0; k<positionSet.length; k++) {
         obstacleSet.push({position: positionSet[k]}) ;
     }
 
@@ -333,24 +333,34 @@ function moveRoverSetOneStep(rover, roverSet, grid, command) {
         scenario. Each rover has its own command set, and on havec to move (if possible) all the rovers until the last command. 
     */
 
+function repSpace(n) {
+    // use to align items in column in function logTracking : return a string of n white space
+    res = '' ;
+    for (let k = 0; k < n; k++) {
+        res += ' ' ;
+    }
+    return(res) ;
+}
+
 function logTracking(roverSet) {
     // print tracking
     let nbStep = roverSet[0].tracking.length ;
 
     let logTrackingText = '\nRovers journey : \n' ;
     roverSet.forEach(rover => {
-        logTrackingText += '' + rover.name + '\t\t' ;
+        logTrackingText += '' + rover.name + repSpace(16-rover.name.length) ;
     }) ;
     logTrackingText += '\n' ;
 
     for (k=0 ; k < nbStep ; k++) {
-        line = '';
-        for (l=0; l < roverSet.length ; l++) {
+        let line = '';
+        for (let l=0; l < roverSet.length ; l++) {
             if (l === roverSet.length-1) {
                 line += '(' + roverSet[l].tracking[k] + ')\n' ;
             } else {
-                line += '(' + roverSet[l].tracking[k] + ')\t|' ;
-            }
+                let trackingText = '(' + roverSet[l].tracking[k] + ')' ;
+                line += trackingText + repSpace(15-trackingText.length) +'|' ;
+            } 
         }
         logTrackingText += line ;
     }
@@ -382,7 +392,7 @@ function moveRoverSet(roverSet, grid) {
     const longestCommandSet = getLongestCommandSet(roverSet) ; 
         // we loop as many time as the longest set of command
 
-    for (k=0 ; k<longestCommandSet ; k++) {
+    for (let k=0 ; k<longestCommandSet ; k++) {
         console.log("Step "+k) ;
         roverSet.forEach(rover => {
             potentialMoveRover(rover, rover.commandSet[k]) ;
@@ -402,17 +412,19 @@ function moveRoverSet(roverSet, grid) {
 
 let rover1 = constructRover('rover1', 'N', [15,18], 'rfffff') ;
 let rover2 = constructRover('rover2', 'N', [11,14], 'rfffff') ;
-let rover3 = constructRover('rover3', 'N', [8,10], 'llffff') ;
+let rover3 = constructRover('rover3', 'N', [9,10], 'llffff') ;
 let rover4 = constructRover('rover4', 'N', [3,8], 'rfflff') ;
 let rover5 = constructRover('rover5', 'N', [3,6], 'rffflf') ;
 let rover6 = constructRover('rover6', 'N', [3,5], 'rffffl') ;
 let rover7 = constructRover('rover7', 'N', [3,4], 'rfffff') ;
 let rover8 = constructRover('rover8', 'N', [10,2], 'lbb') ;
+let rover9 = constructRover('rover9', 'N', [5,9], 'rrrllff') ;
+let rover10 = constructRover('rover10', 'N', [4,9], 'rrrllff') ;
 
 
 
 
-roverSet = [rover1, rover2, rover3, rover4, rover5, rover6, rover7, rover8] ;
+roverSet = [rover1, rover2, rover3, rover4, rover5, rover6, rover7, rover8, rover9, rover10] ;
 
 let obstaclePositionSet = [ [11,16]] ;
 let obstacleSet = constructObstacleSet(obstaclePositionSet) ;
