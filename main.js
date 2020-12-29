@@ -2,6 +2,7 @@ let libMove = require("./lib-move") ;
 
 /* 
 Mars rover objects :
+
 We will use two objects in this project : 
     1/ "grid" which represent mars ground : it contains two objects : 
         a) a size which is an array of two number which represent the horizontal and vertical size of the grid
@@ -10,7 +11,7 @@ We will use two objects in this project :
 Previous objects contains other objects that we will describe now : 
     1/ "rover" : it contains :
         a) a name 
-        b) direction : The direction property can contain one of four values: "N", "S", "E", or "W". 
+        b) direction : it is the CURRENT direction. the direction property can contain one of four values: "N", "S", "E", or "W". 
         The rover’s default direction will be "N" (as North).
         c) position : an array of two number which give its position
         d) tracking : an array whose each element is an array of two number and a direction : it represents the histocal of moves of the rover
@@ -21,17 +22,21 @@ Previous objects contains other objects that we will describe now :
         b) a position : an array of two number which represent the position of the obstacle
 */
 
-let rover1 = libMove.constructRover('rover1', 'N', [1,6], 'rffffff') ;
-let rover2 = libMove.constructRover('rover2', 'N', [1,5], 'rfffffff') ;
-let rover3 = libMove.constructRover('rover3', 'N', [1,3], 'rrrr') ;
+let rover1 = libMove.constructRover('rover1', 'N', [1,3], 'rffff') ;
+let rover2 = libMove.constructRover('rover2', 'N', [1,7], 'lfffff') ;
+let rover3 = libMove.constructRover('rover3', 'N', [1,2], 'rffffff') ;
+let rover4 = libMove.constructRover('rover4', 'N', [4,3], 'llffffff') ;
 
-roverSet = [rover1, rover2] ;
 
-let obstaclePositionSet = [[1,4], [10,10]] ;
+roverSet = [rover1, rover2, rover3] ;
+
+let obstaclePositionSet = [ [10,10]] ;
 let obstacleSet = libMove.constructObstacleSet(obstaclePositionSet) ;
-let grid = libMove.constructGrid([8,8], obstacleSet) ;
+let grid = libMove.constructGrid([10,10], obstacleSet) ;
 
 //console.log(grid.obstacleSet) ;
 //console.log(libMove.moveForward(roverSet[0], grid)) ;
-libMove.moveRoverSet(roverSet, grid) ;
-console.log(rover1)
+libMove.main(roverSet, grid) ;
+
+a = ['a', 'b'];
+console.log(a.includes('a')) ;
