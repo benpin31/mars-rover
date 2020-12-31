@@ -88,6 +88,12 @@ function constructGrid(gridSize, obstacleSet) {
     return grid ;
 } 
 
+function setAttribute(grid, gridSize, obstacleSet) {
+    // update attribute of a grid
+    grid.size = gridSize ;
+    grid.obstacleSet = obstacleSet ;
+    
+} 
 
 /*  Move functions
 
@@ -521,38 +527,142 @@ function roverJourney(ctx, grid, roverSet, roverJourneyStep) {
 
 /* Main */
 
-let canvas = document.getElementById("myCanvas");
-let ctx = canvas.getContext("2d");
-let obstacleSprite = document.getElementById("obstacle");
-let roverSprite = document.getElementById("rocket");
-let angle = Math.PI/2 ;
-
-let rover1 = constructRover('R1', 'E', [6,2], 'ffffff') ;
-let rover2 = constructRover('R2', 'E', [6,1], 'ffffff') ;
-let rover3 = constructRover('R3', 'O', [6,11], 'ffffff') ;
-let rover4 = constructRover('R4', 'O', [6,10], 'ffffff') ;
-let rover5 = constructRover('R5', 'N', [1,6], 'ffffff') ;
-let rover6 = constructRover('R6', 'N', [2,6], 'ffffff') ;
-let rover7 = constructRover('R7', 'S', [11,6], 'ffffff') ;
-let rover8 = constructRover('R8', 'S', [10,6], 'ffffff') ;
-let rover9 = constructRover('R9', 'N', [5,9], 'ffffff') ;
-let rover10 = constructRover('R10', 'N', [4,9], 'ffff') ;
-
-roverSet = [rover1, rover2,rover3,rover4,rover5,rover6,rover7,rover8];//,rover9,rover10] ;
+const canvas = document.getElementById("myCanvas");
+const ctx = canvas.getContext("2d");
+const obstacleSprite = document.getElementById("obstacle");
+const roverSprite = document.getElementById("rocket");
+const angle = Math.PI/2 ;
 
 const roverJourneyStep = {
-  step: 0,
-  maxStep: getLongestCommandSet(roverSet)
+    step: 0,
+    maxStep: 1
 } ;
 
-let obstaclePositionSet = [ [6,6]] ;
-let obstacleSet = constructObstacleSet(obstaclePositionSet) ;
+const roverSet = [] ;
+const grid = constructGrid([10,10], constructObstacleSet([[]]));
 
-let grid = constructGrid([11,11], obstacleSet) ;
+let interval = undefined;
+
+function clearObject(roverJourneyStep, roverSet, grid) {
+    roverJourneyStep.step = 0;
+    roverJourneyStep.maxStep = 1;
+    roverSet.splice(0,roverSet.length) ;
+    grid.size = [10,10];
+    grid.obstacleSet = [] ;
+}
+
+function scenario1(roverJourneyStep, roverSet, grid) {
+    clearObject(roverJourneyStep, roverSet, grid) ;
+
+    let rover1 = constructRover('R1', 'E', [6,2], 'ffffff') ;
+    let rover2 = constructRover('R2', 'E', [6,1], 'ffffff') ;
+    let rover3 = constructRover('R3', 'O', [6,10], 'ffffff') ;
+    let rover4 = constructRover('R4', 'O', [6,11], 'ffffff') ;
+    let rover5 = constructRover('R5', 'N', [2,6], 'ffffff') ;
+    let rover6 = constructRover('R6', 'N', [1,6], 'ffffff') ;
+    let rover7 = constructRover('R7', 'S', [10,6], 'ffffff') ;
+    let rover8 = constructRover('R8', 'S', [11,6], 'ffffff') ;
+    let rover9 = constructRover('R9', 'S', [9,6], 'ffffff') ;
+    
+    roverSet.push(rover1, rover2,rover3,rover4,rover5,rover6,rover7,rover8,rover9) ;
+    
+    roverJourneyStep.maxStep = getLongestCommandSet(roverSet) ;
+    
+    let obstaclePositionSet = [ [6,6]] ;
+    setAttribute(grid, [11,11], constructObstacleSet(obstaclePositionSet)) ;
+}
+
+function chooseScenario1() {
+    clearInterval(interval) ;
+    scenario1(roverJourneyStep, roverSet, grid) ;
+    drawGrid(ctx,(grid.size[0])*40,(grid.size[1])*40) ;
+    drawElements(ctx, grid, roverSet, roverJourneyStep) ;
+} 
+
+function scenario2(roverJourneyStep, roverSet, grid) {
+    clearObject(roverJourneyStep, roverSet, grid) ;
+
+    let command1 = 'ffl' ;
+    let command2 = 'lff' ;
+    let command3 = 'flf' ;
+
+    nbTurn = 1;
+    for(let k=1; k<=nbTurn*3; k++) {
+        command1+='fffl';
+        command2+='flff';
+        command3+='fflf';
+    }
+
+    command1+='frffff';
+    command2+='frffff';
+    command3+='frffff';
+
+    let rover1 = constructRover('R1', 'E', [4,5], command1) ;
+    let rover2 = constructRover('R2', 'E', [4,7], command2) ;
+    let rover3 = constructRover('R3', 'N', [6,7], command3) ;
+    let rover4 = constructRover('R4', 'O', [7,6], command1) ;
+    let rover5 = constructRover('R5', 'O', [7,4], command2) ;
+    let rover6 = constructRover('R6', 'S', [5,4], command3) ;
+    
+    roverSet.push(rover1, rover2,rover3,rover4,rover5,rover6) ;
+    
+    roverJourneyStep.maxStep = getLongestCommandSet(roverSet) ;
+    
+    let obstaclePositionSet = [ [5,6], [6,6], [6,5], [5,5]] ;
+    setAttribute(grid, [10,10], constructObstacleSet(obstaclePositionSet)) ;
+}
+
+function chooseScenario2() {
+    clearInterval(interval) ;
+    scenario2(roverJourneyStep, roverSet, grid) ;
+    drawGrid(ctx,(grid.size[0])*40,(grid.size[1])*40) ;
+    drawElements(ctx, grid, roverSet, roverJourneyStep) ;
+} 
+
+function createGrid() {
+    if(document.getElementById('grid-size-1').value !== '') {
+        setAttribute(grid, [document.getElementById('grid-size-1').value,document.getElementById('grid-size-2').value], constructObstacleSet([[]])) ;
+    }
+    drawGrid(ctx,(grid.size[0])*40,(grid.size[1])*40) ;
+}
+
+function addObstacle() {
+    grid.obstacleSet.push({type:"obstacle", position: [parseInt(document.getElementById('Obstacle-position-1').value),parseInt(document.getElementById('Obstacle-position-2').value)]}) ;
+    console.log(document.getElementById('Obstacle-position-1').value) ;
+    drawElements(ctx, grid, roverSet, roverJourneyStep) ;
+}
+
+function addRover() {
+    let rover=constructRover(
+        document.getElementById('rover-name').value, 
+        document.getElementById('rover-direction').value,  
+        [parseInt(document.getElementById('rover-position-1').value),parseInt(document.getElementById('rover-position-2').value)], 
+        document.getElementById('rover-command').value
+        );
+    roverSet.push(rover) ;
+    drawElements(ctx, grid, roverSet, roverJourneyStep) ;
+    roverJourneyStep.maxStep = getLongestCommandSet(roverSet) ;
+}
+
+function chooseScenario3() {
+    clearInterval(interval) ;
+    scenario2(roverJourneyStep, roverSet, grid) ;
+    drawGrid(ctx,(grid.size[0])*40,(grid.size[1])*40) ;
+    drawElements(ctx, grid, roverSet, roverJourneyStep) ;
+} 
+
+function clearScenario() {
+    clearObject(roverJourneyStep, roverSet, grid) ;
+    drawElements(ctx, grid, roverSet, roverJourneyStep) ;
+}
+
+function launchScenario() {
+    console.log(grid) ;
+    console.log(roverJourneyStep) ;
+    console.log(roverSet);
+    interval=setInterval( function() { roverJourney(ctx, grid, roverSet,roverJourneyStep) ;}, 1000);
+}
 
 
-//moveRoverSet(roverSet, grid) ;
 
-drawGrid(ctx,(grid.size[0])*40,(grid.size[1])*40) ;
-interval=setInterval( function() { roverJourney(ctx, grid, roverSet,roverJourneyStep) ;}, 1000);
 
