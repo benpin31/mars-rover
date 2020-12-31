@@ -1,0 +1,12 @@
+body { 
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-image: url("https://www.dropbox.com/s/bpve4k1yn0fbodf/Mars.jpg?raw=1");
+    background-size: cover;
+  }
+  
+  /*canvas {
+    background-color: rgba(0, 0, 0, 0.5) ;
+  }*/

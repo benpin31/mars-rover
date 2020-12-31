@@ -51,7 +51,7 @@ function areArrayEqual(arr1, arr2) {
         2/ "obstacle". It is an object which contains a position : an array of two number which represent the position of the obstacle. 
 */
 
-exports.constructRover = function(name, direction, position, commandSet) {
+function constructRover(name, direction, position, commandSet) {
     // constructor of a rover
     let rover = {
         name: name,
@@ -65,20 +65,20 @@ exports.constructRover = function(name, direction, position, commandSet) {
     } ;
 
     return rover ;
-} ;
+} 
 
-exports.constructObstacleSet = function(positionSet) {
+function constructObstacleSet(positionSet) {
     // constructor of obstacle
     const obstacleSet = [] ;
     
-    for (k=0; k<positionSet.length; k++) {
-        obstacleSet.push({position: positionSet[k]}) ;
+    for (let k=0; k<positionSet.length; k++) {
+        obstacleSet.push({type:"obstacle", position: positionSet[k]}) ;
     }
 
     return obstacleSet;
-} ;
+} 
 
-exports.constructGrid = function(gridSize, obstacleSet) {
+function constructGrid(gridSize, obstacleSet) {
     // constructor of grid
     const grid = {
         size: gridSize,
@@ -86,7 +86,7 @@ exports.constructGrid = function(gridSize, obstacleSet) {
     } ;
     
     return grid ;
-} ;
+} 
 
 
 /*  Move functions
@@ -237,7 +237,7 @@ function turnOff(rover, grid) {
   rover.status='OFF' ; 
   rover.nextPosition = rover.position ;
   rover.nextDirection = rover.direction ;
-  grid.obstacleSet.push({position: rover.position}) ;
+  grid.obstacleSet.push({position: rover.position, type:"rover"}) ;
 }
     
 function stoppedChainedRover(stoppedRover, roverSet, grid) {
@@ -257,7 +257,7 @@ function stoppedChainedRover(stoppedRover, roverSet, grid) {
     if (roverToStop.length !== 0) {
         roverToStop.forEach(rover => {
             turnOff(rover, grid) ;
-            console.log(`Rover ${rover.name} stopped because rover ${stoppedRover.name} stopped before it` ) ;
+            console.log(`${rover.name} is chained stopped because of ${stoppedRover.name}` ) ;
             stoppedChainedRover(rover, roverSet, grid); // RULE 4 : always chain stop the rovers
             //recursive part : One have to find rover stopped by the previous stopped rovers.
         }) ;
@@ -273,7 +273,7 @@ function updateTracking(rover) {
 }
 
 
-function moveRoverSetOneStep(rover, roverSet, grid, command) {
+function validateMove(rover, roverSet, grid, command) {
     /*  Move the rovers taking account of the differents obstacles on the grid. First, one check and stop all the rover that have to,
         then we effectively move the rover updating rover.position and rover.direction. Each move or stop is loged. */ 
     if (rover.status === 'ON') {
@@ -282,11 +282,11 @@ function moveRoverSetOneStep(rover, roverSet, grid, command) {
                 // RULE 1
                 turnOff(rover, grid) ;
                 stoppedChainedRover(rover, roverSet, grid) ; // RULE 4 : always chain stop the rovers
-                console.log(`Rover ${rover.name} stopped because it exceed grid size`);
+                console.log(`${rover.name} stopped because it exceed grid size`);
             } else if (nextPositionIsAnObstacle(rover, grid)) {
                 turnOff(rover, grid) ;
                 stoppedChainedRover(rover, roverSet, grid) ; // RULE 4 : always chain stop the rovers
-                console.log(`Rover ${rover.name} stopped because it meet an obstacle`);
+                console.log(`${rover.name} stopped because it meet an obstacle`);
             } else if (getCrashedRover(rover, roverSet).length > 0) {
                 roverToStop = getCrashedRover(rover, roverSet);
                 roverToStop.unshift(rover) ;
@@ -298,34 +298,27 @@ function moveRoverSetOneStep(rover, roverSet, grid, command) {
                     stoppedChainedRover(crashedRover, roverSet, grid) ; // RULE 4 : always chain stop the rovers
                     roverNameList += crashedRover.name + ",";
                 }) ;
-                console.log(`Rover ${roverNameList} stopped because they would have crashed together`);
+                console.log(`${roverNameList} stopped because they would have crashed together`);
             } else {
-                if (['r', 'l'].includes(command)) {
-                    console.log(`Rover ${rover.name} turn from ${rover.direction} to ${rover.nextDirection}`);
-                } else {
-                    console.log(`Rover ${rover.name} move from (${rover.position}) to (${rover.nextPosition})`);
-                }
-                rover.position = rover.nextPosition ;
-                rover.direction = rover.nextDirection ;
             }
         } else if (command === undefined) {
             // if there is no more command for the rover, its journey is finished and we stop it
             turnOff(rover, grid) ;
             stoppedChainedRover(rover, roverSet, grid) ; // RULE 4 : always chain stop the rovers
-            console.log(`Rover ${rover.name} command push is finished. Rover turn off. Current position = (${rover.position})`);
+            console.log(`${rover.name} command push is finished. Rover turn off. Current position = (${rover.position})`);
         } else {
             // if the commande is not l, r, f, b or empty, this is a mistake and the rover stop
             turnOff(rover, grid) ;
             stoppedChainedRover(rover, roverSet, grid) ; // RULE 4 : always chain stop the rovers
-            console.log(`Bad command : Rover ${rover.name} is stopped. Current position = (${rover.position})`);
+            console.log(`Bad command : ${rover.name} is stopped. Current position = (${rover.position})`);
         }
     } else {
-        console.log(`Rover ${rover.name} is OFF. Current position = (${rover.position})`);
+        console.log(`${rover.name} is OFF. Current position = (${rover.position})`);
     }
 
-    updateTracking(rover) ;  
-
 }
+
+
 
     /*  Realization of the complete scenario : 
 
@@ -333,42 +326,41 @@ function moveRoverSetOneStep(rover, roverSet, grid, command) {
         scenario. Each rover has its own command set, and on havec to move (if possible) all the rovers until the last command. 
     */
 
-function logTracking(tracking) {
-    // print tracking
-
-    let textTracking = '' ;
-    for (step = 0; step < tracking.length; step++) {
-        if (step === 0) {
-            textTracking += "(" + tracking[step] + ")" ;
-        } else  {
-            if (step%5 === 4) {
-                textTracking += " \n => (" + tracking[step] + ")" ;
-            } else {
-                textTracking += " => (" + tracking[step] + ")" ;
-            }
-        }
+function repSpace(n) {
+    // use to align items in column in function logTracking : return a string of n white space
+    res = '' ;
+    for (let k = 0; k < n; k++) {
+        res += ' ' ;
     }
-
-    return textTracking + ' => END';
+    return(res) ;
 }
 
-function logTracking2(roverSet) {
+function logTracking(roverSet) {
+    // print tracking
     let nbStep = roverSet[0].tracking.length ;
 
-    let logTrackingText = '' ;
+    let logTrackingText = '\nRovers journey : \n' ;
+    roverSet.forEach(rover => {
+        logTrackingText += '' + rover.name + repSpace(16-rover.name.length) ;
+    }) ;
+    logTrackingText += '\n' ;
+
     for (k=0 ; k < nbStep ; k++) {
-        line = '';
-        roverSet.forEach(rover => {
-            if (k === nbStep-1) {
-                line += '    ' + rover.tracking[k] + '\n' ;
+        let line = '';
+        for (let l=0; l < roverSet.length ; l++) {
+            if (l === roverSet.length-1) {
+                line += '(' + roverSet[l].tracking[k] + ')\n' ;
             } else {
-                line += '    ' + rover.tracking[k] +     | ;
-            }
-        }) ;
+                let trackingText = '(' + roverSet[l].tracking[k] + ')' ;
+                line += trackingText + repSpace(15-trackingText.length) +'|' ;
+            } 
+        }
         logTrackingText += line ;
     }
 
-    return logTrackingText ;
+
+
+    console.log(logTrackingText) ;
 }
 
 function getLongestCommandSet(roverSet) {
@@ -388,27 +380,179 @@ function getLongestCommandSet(roverSet) {
 
 } 
 
-exports.moveRoverSet = function(roverSet, grid) {
+function moveRoverSet(roverSet, grid) {
 
     const longestCommandSet = getLongestCommandSet(roverSet) ; 
         // we loop as many time as the longest set of command
 
-    for (k=0 ; k<longestCommandSet ; k++) {
+    for (let k=0 ; k<longestCommandSet ; k++) {
         console.log("Step "+k) ;
         roverSet.forEach(rover => {
             potentialMoveRover(rover, rover.commandSet[k]) ;
         }) ;
         // compute the potential rover next moves
         roverSet.forEach(rover => {
-            moveRoverSetOneStep(rover, roverSet, grid, rover.commandSet[k]) ;
+            validateMove(rover, roverSet, grid, rover.commandSet[k]) ;
         }) ;
+
+        roverSet.forEach(rover => {
+            if (rover.status === 'ON') {
+                if (['r', 'l'].includes(rover.commandSet[k])) {
+                    console.log(`${rover.name} turn from ${rover.direction} to ${rover.nextDirection}`);
+                } else {
+                    console.log(`${rover.name} move from (${rover.position}) to (${rover.nextPosition})`);
+                }
+                rover.position = rover.nextPosition ;
+                rover.direction = rover.nextDirection ;
+            }
+            updateTracking(rover) ;  
+        }) ;
+
         // validate or not each moves
     }
 
-    console.log('Rover moves : ') ;
-    roverSet.forEach(rover => {
-        console.log(`${rover.name} tracking : ` + logTracking(rover.tracking)) ;
-    }) ;
+    logTracking(roverSet) ;
+} 
 
-    logTracking2(roverSet) ;
+function moveRoverSetOneStep(roverSet, grid, roverJourneyStep) {
+
+        // we loop as many time as the longest set of command
+
+    if (roverJourneyStep.step < roverJourneyStep.maxStep) {
+        roverSet.forEach(rover => {
+            potentialMoveRover(rover, rover.commandSet[roverJourneyStep.step]) ;
+        }) ;
+        // compute the potential rover next moves
+        roverSet.forEach(rover => {
+            validateMove(rover, roverSet, grid, rover.commandSet[roverJourneyStep.step]) ;
+        }) ;
+
+        roverSet.forEach(rover => {
+            if (rover.status === 'ON') {
+                if (['r', 'l'].includes(rover.commandSet[roverJourneyStep.step])) {
+                    console.log(`${rover.name} turn from ${rover.direction} to ${rover.nextDirection}`);
+                } else {
+                    console.log(`${rover.name} move from (${rover.position}) to (${rover.nextPosition})`);
+                }
+                rover.position = rover.nextPosition ;
+                rover.direction = rover.nextDirection ;
+            }
+            updateTracking(rover) ;  
+        }) ;
+    }
+
+} 
+
+/* Drawing function */
+
+function drawGrid(ctx, h, w) {
+    // Principals element of ctx
+    ctx.canvas.width  = w;
+    ctx.canvas.height = h;
+    ctx.font="13px Calibri";
+    ctx.fillStyle = '#000000b0';
+    ctx.fillRect(0,0,canvas.width, canvas.height);
+}
+
+function drawImage(ctx,image, x, y, w, h, radian){
+    // print rovers and obstacle sprite. Element can be rotated
+    ctx.save();
+    ctx.translate(x+w/2, y+h/2);
+    ctx.rotate(radian);
+    ctx.translate(-x-w/2, -y-h/2);
+    ctx.drawImage(image, x, y, w, h);
+    ctx.restore();
+} 
+
+function drawElements(ctx, grid, roverSet, roverJourneyStep) {
+    // plot rover sprite given it's position and direction
+    let positionRow ;
+    let positionCol ;
+
+    if (roverJourneyStep.step < roverJourneyStep.maxStep) {
+        ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height) ;
+        ctx.fillStyle = '#000000b0';
+        ctx.fillRect(0,0,canvas.width, canvas.height);
+
+        grid.obstacleSet.forEach(obstacle => {
+            if (obstacle.type === 'obstacle') {
+                positionRow = (grid.size[0] - obstacle.position[0])*40 ;
+                positionCol = (obstacle.position[1]-1)*40 ;
+                drawImage(ctx,obstacleSprite,positionCol, positionRow, 40,40, 0);
+            }
+        }) ;
+
+        roverSet.forEach(rover => {
+            positionRow = (grid.size[0] - rover.position[0])*40 ;
+            positionCol = (rover.position[1]-1)*40 ;
+            switch(rover.direction) {
+            case 'N':
+                drawImage(ctx,roverSprite, positionCol, positionRow , 40, 40, 0);            
+                break ;
+            case 'S':
+                drawImage(ctx,roverSprite, positionCol, positionRow , 40, 40, Math.PI);            
+                break ;
+            case 'E':
+                drawImage(ctx,roverSprite, positionCol, positionRow , 40, 40, Math.PI/2);            
+                break ;
+            case 'O':
+                drawImage(ctx,roverSprite, positionCol, positionRow , 40, 40, -Math.PI/2);            
+                break ;
+            }
+            ctx.fillStyle  = "white";
+            ctx.fillText(rover.name, positionCol, positionRow);
+        }) ;
+    }
+}
+
+function roverJourney(ctx, grid, roverSet, roverJourneyStep) {
+    // draw the journey of rovers on mars, function must ce called through a setInterval function
+
+    moveRoverSetOneStep(roverSet, grid, roverJourneyStep) ;
+    drawElements(ctx, grid, roverSet, roverJourneyStep) ;
+    if ( roverJourneyStep.step !== roverJourneyStep.maxStep -1)  {
+        roverJourneyStep.step++ ;
+    } else {
+        clearInterval(interval) ;
+        logTracking(roverSet) ;
+    }
+}
+
+
+/* Main */
+
+let canvas = document.getElementById("myCanvas");
+let ctx = canvas.getContext("2d");
+let obstacleSprite = document.getElementById("obstacle");
+let roverSprite = document.getElementById("rocket");
+let angle = Math.PI/2 ;
+
+let rover1 = constructRover('R1', 'E', [6,2], 'ffffff') ;
+let rover2 = constructRover('R2', 'E', [6,1], 'ffffff') ;
+let rover3 = constructRover('R3', 'O', [6,11], 'ffffff') ;
+let rover4 = constructRover('R4', 'O', [6,10], 'ffffff') ;
+let rover5 = constructRover('R5', 'N', [1,6], 'ffffff') ;
+let rover6 = constructRover('R6', 'N', [2,6], 'ffffff') ;
+let rover7 = constructRover('R7', 'S', [11,6], 'ffffff') ;
+let rover8 = constructRover('R8', 'S', [10,6], 'ffffff') ;
+let rover9 = constructRover('R9', 'N', [5,9], 'ffffff') ;
+let rover10 = constructRover('R10', 'N', [4,9], 'ffff') ;
+
+roverSet = [rover1, rover2,rover3,rover4,rover5,rover6,rover7,rover8];//,rover9,rover10] ;
+
+const roverJourneyStep = {
+  step: 0,
+  maxStep: getLongestCommandSet(roverSet)
 } ;
+
+let obstaclePositionSet = [ [6,6]] ;
+let obstacleSet = constructObstacleSet(obstaclePositionSet) ;
+
+let grid = constructGrid([11,11], obstacleSet) ;
+
+
+//moveRoverSet(roverSet, grid) ;
+
+drawGrid(ctx,(grid.size[0])*40,(grid.size[1])*40) ;
+interval=setInterval( function() { roverJourney(ctx, grid, roverSet,roverJourneyStep) ;}, 1000);
+
