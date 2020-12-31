@@ -95,6 +95,15 @@ function setAttribute(grid, gridSize, obstacleSet) {
     
 } 
 
+function clearObject(roverJourneyStep, roverSet, grid) {
+    // Give to principal object their intial value
+    roverJourneyStep.step = 0;
+    roverJourneyStep.maxStep = 1;
+    roverSet.splice(0,roverSet.length) ;
+    grid.size = [10,10];
+    grid.obstacleSet = [] ;
+}
+
 /*  Move functions
 
     Moving a rover will depend on various factors : next move could be impossible because the rover will get out the limit of the grid, 
@@ -278,7 +287,6 @@ function updateTracking(rover) {
     rover.tracking.push(newTracking) ;
 }
 
-
 function validateMove(rover, roverSet, grid, command) {
     /*  Move the rovers taking account of the differents obstacles on the grid. First, one check and stop all the rover that have to,
         then we effectively move the rover updating rover.position and rover.direction. Each move or stop is loged. */ 
@@ -323,7 +331,6 @@ function validateMove(rover, roverSet, grid, command) {
     }
 
 }
-
 
 
     /*  Realization of the complete scenario : 
@@ -386,43 +393,14 @@ function getLongestCommandSet(roverSet) {
 
 } 
 
-function moveRoverSet(roverSet, grid) {
-
-    const longestCommandSet = getLongestCommandSet(roverSet) ; 
-        // we loop as many time as the longest set of command
-
-    for (let k=0 ; k<longestCommandSet ; k++) {
-        console.log("Step "+k) ;
-        roverSet.forEach(rover => {
-            potentialMoveRover(rover, rover.commandSet[k]) ;
-        }) ;
-        // compute the potential rover next moves
-        roverSet.forEach(rover => {
-            validateMove(rover, roverSet, grid, rover.commandSet[k]) ;
-        }) ;
-
-        roverSet.forEach(rover => {
-            if (rover.status === 'ON') {
-                if (['r', 'l'].includes(rover.commandSet[k])) {
-                    console.log(`${rover.name} turn from ${rover.direction} to ${rover.nextDirection}`);
-                } else {
-                    console.log(`${rover.name} move from (${rover.position}) to (${rover.nextPosition})`);
-                }
-                rover.position = rover.nextPosition ;
-                rover.direction = rover.nextDirection ;
-            }
-            updateTracking(rover) ;  
-        }) ;
-
-        // validate or not each moves
-    }
-
-    logTracking(roverSet) ;
-} 
-
-function moveRoverSetOneStep(roverSet, grid, roverJourneyStep) {
-
-        // we loop as many time as the longest set of command
+function moveRoverSet(roverSet, grid, roverJourneyStep) {
+    /* After having launch potiential moves, a stopped rovers when we have to do, we effectivelly move 
+    the rover which can continue.
+    
+    This fonction dosn't have a loop. It is suppose to be launche with a setInterval for drawing reason. To
+    evolve in the journey, we use roverJourneyStep which is an object which containe the current step, and the 
+    max step value. each time the cuntion is call with setInteval, the current step increase from 1.
+    */
 
     if (roverJourneyStep.step < roverJourneyStep.maxStep) {
         roverSet.forEach(rover => {
@@ -449,10 +427,13 @@ function moveRoverSetOneStep(roverSet, grid, roverJourneyStep) {
 
 } 
 
-/* Drawing function */
+/*  interface and drawing function function
+
+    This part gather the functions used to draw and create the interface 
+*/
 
 function drawGrid(ctx, h, w) {
-    // Principals element of ctx
+    /* Draw the grid on wich the rover is moving */
     ctx.canvas.width  = w;
     ctx.canvas.height = h;
     ctx.font="13px Calibri";
@@ -461,7 +442,7 @@ function drawGrid(ctx, h, w) {
 }
 
 function drawImage(ctx,image, x, y, w, h, radian){
-    // print rovers and obstacle sprite. Element can be rotated
+    /* Imporve the draw image function allowing it to rotate and image */
     ctx.save();
     ctx.translate(x+w/2, y+h/2);
     ctx.rotate(radian);
@@ -471,7 +452,7 @@ function drawImage(ctx,image, x, y, w, h, radian){
 } 
 
 function drawElements(ctx, grid, roverSet, roverJourneyStep) {
-    // plot rover sprite given it's position and direction
+    /* plot rover sprite and obstacle given there position and direction (for rover) */
     let positionRow ;
     let positionCol ;
 
@@ -511,10 +492,12 @@ function drawElements(ctx, grid, roverSet, roverJourneyStep) {
     }
 }
 
-function roverJourney(ctx, grid, roverSet, roverJourneyStep) {
-    // draw the journey of rovers on mars, function must ce called through a setInterval function
+function roverJourney(ctx, grid, roverSet, roverJourneyStep, interval) {
+    /*  draw the journey of rovers on mars, function must ce called through a setInterval function.
+        here, interval is the result of setInterval, when the journey step reach its maximum value, clear interval
+        stop with intervalm as parameter stop the loop*/
 
-    moveRoverSetOneStep(roverSet, grid, roverJourneyStep) ;
+    moveRoverSet(roverSet, grid, roverJourneyStep) ;
     drawElements(ctx, grid, roverSet, roverJourneyStep) ;
     if ( roverJourneyStep.step !== roverJourneyStep.maxStep -1)  {
         roverJourneyStep.step++ ;
@@ -524,32 +507,16 @@ function roverJourney(ctx, grid, roverSet, roverJourneyStep) {
     }
 }
 
+/*  Scenario creation and launch
 
-/* Main */
+    We gather here the principal scenario construction from the browser interface and display on the interface
+*/
 
-const canvas = document.getElementById("myCanvas");
-const ctx = canvas.getContext("2d");
-const obstacleSprite = document.getElementById("obstacle");
-const roverSprite = document.getElementById("rocket");
-const angle = Math.PI/2 ;
-
-const roverJourneyStep = {
-    step: 0,
-    maxStep: 1
-} ;
-
-const roverSet = [] ;
-const grid = constructGrid([10,10], constructObstacleSet([[]]));
-
-let interval = undefined;
-
-function clearObject(roverJourneyStep, roverSet, grid) {
-    roverJourneyStep.step = 0;
-    roverJourneyStep.maxStep = 1;
-    roverSet.splice(0,roverSet.length) ;
-    grid.size = [10,10];
-    grid.obstacleSet = [] ;
-}
+    /*  Senario 1 
+    
+        In this scenario : One obstacle between, 9 rovers which rush over it from the 4 sides. When a rover reach the 
+        obstacle, it stopped, and all the rovers wich a following stop equally
+    */
 
 function scenario1(roverJourneyStep, roverSet, grid) {
     clearObject(roverJourneyStep, roverSet, grid) ;
@@ -573,11 +540,18 @@ function scenario1(roverJourneyStep, roverSet, grid) {
 }
 
 function chooseScenario1() {
+    // scenario 1 preparation : one jsut have to launch launchScenario function to begin the trip
     clearInterval(interval) ;
     scenario1(roverJourneyStep, roverSet, grid) ;
     drawGrid(ctx,(grid.size[0])*40,(grid.size[1])*40) ;
     drawElements(ctx, grid, roverSet, roverJourneyStep) ;
 } 
+
+    /*  Scenario 2
+    
+        Six rovers dance around 4 volcanos. They all make a complete tour then move away the center. They stop when 
+        they reach the grid limit
+    */
 
 function scenario2(roverJourneyStep, roverSet, grid) {
     clearObject(roverJourneyStep, roverSet, grid) ;
@@ -613,55 +587,168 @@ function scenario2(roverJourneyStep, roverSet, grid) {
 }
 
 function chooseScenario2() {
+    // scenario 2 preparation : one jsut have to launch launchScenario function to begin the trip
     clearInterval(interval) ;
     scenario2(roverJourneyStep, roverSet, grid) ;
     drawGrid(ctx,(grid.size[0])*40,(grid.size[1])*40) ;
     drawElements(ctx, grid, roverSet, roverJourneyStep) ;
 } 
 
+    /*  Scenario 3
+    
+        The user can create his/her own scenario : 
+    */
+
 function createGrid() {
-    if(document.getElementById('grid-size-1').value !== '') {
-        setAttribute(grid, [document.getElementById('grid-size-1').value,document.getElementById('grid-size-2').value], constructObstacleSet([[]])) ;
+    // create a grid using user values
+    let gridSize1 = document.getElementById('grid-size-1').value;
+    let gridSize2 = document.getElementById('grid-size-2').value;
+
+    if(gridSize1 !== '' && gridSize2 != '') {
+        setAttribute(grid, [parseInt(gridSize1),parseInt(gridSize2)], constructObstacleSet([])) ;
+    } else {
+        window.alert("Some filed are empty : default grid (10-10) is constructed") ;
     }
     drawGrid(ctx,(grid.size[0])*40,(grid.size[1])*40) ;
-}
+} 
 
 function addObstacle() {
-    grid.obstacleSet.push({type:"obstacle", position: [parseInt(document.getElementById('Obstacle-position-1').value),parseInt(document.getElementById('Obstacle-position-2').value)]}) ;
-    console.log(document.getElementById('Obstacle-position-1').value) ;
-    drawElements(ctx, grid, roverSet, roverJourneyStep) ;
+    // add an obstacle to obstacle set using user values
+
+    let obstaclePosition1 = document.getElementById('Obstacle-position-1').value;
+    let obstaclePosition2 = document.getElementById('Obstacle-position-2').value;
+
+    if (obstaclePosition1 !== '' && obstaclePosition2 !== '') {
+        grid.obstacleSet.push({type:"obstacle", position: [parseInt(obstaclePosition1),parseInt(obstaclePosition2)]}) ;
+        drawElements(ctx, grid, roverSet, roverJourneyStep) ;
+    } else {
+        window.alert("All field must be filled in order to create a osbtacle") ;
+    }
+
+}
+
+function aRoverHasTheSameName(newRover, roverSet) {
+    /*  return true if a rover of rover set has the same name than newRover. The function is used to avoid a user 
+        to do the error */
+    let cpt=0;
+    roverSet.forEach(rover => {
+        if (rover.name === newRover.name) {
+            cpt ++ ;
+        }
+    }) ;
+
+    return(cpt > 0) ;
+}
+
+function aRoverHasTheSamePosition(newRover, roverSet) {
+    /*  return true if a rover of rover set has the same name than newRover. The function is used to avoid a user 
+        to do the error */
+    let cpt=0;
+    roverSet.forEach(rover => {
+        if (areArrayEqual(rover.position, newRover.position)) {
+            cpt ++ ;
+        }
+    }) ;
+
+    return(cpt > 0) ;
 }
 
 function addRover() {
-    let rover=constructRover(
-        document.getElementById('rover-name').value, 
-        document.getElementById('rover-direction').value,  
-        [parseInt(document.getElementById('rover-position-1').value),parseInt(document.getElementById('rover-position-2').value)], 
-        document.getElementById('rover-command').value
-        );
-    roverSet.push(rover) ;
-    drawElements(ctx, grid, roverSet, roverJourneyStep) ;
-    roverJourneyStep.maxStep = getLongestCommandSet(roverSet) ;
+    // add a rover the the rover set using user values
+    let roverName=document.getElementById('rover-name').value ;
+    let roverDirection=document.getElementById('rover-direction').value ;
+    let roverPosition1=document.getElementById('rover-position-1').value ;
+    let roverPosition2=document.getElementById('rover-position-2').value ;
+    let roverCommand=document.getElementById('rover-command').value;
+
+    if(roverName!=='' && roverDirection !== '' && roverPosition1 !== '' && roverPosition2 !== '' && roverCommand !== '') {
+        let newRover=constructRover(
+            roverName, 
+            roverDirection,  
+            [parseInt(roverPosition1),parseInt(roverPosition2)], 
+            roverCommand
+            );
+    
+            console.log(newRover) ;
+    
+        if (aRoverHasTheSameName(newRover, roverSet)) {
+            window.alert("You can't create a rover with the same name than another rover") ;
+        } else if (aRoverHasTheSamePosition(newRover, roverSet)) {
+            window.alert("You can't create a rover with the same position than another rover") ;
+        } else {
+            roverSet.push(newRover) ;
+            drawGrid(ctx,(grid.size[0])*40,(grid.size[1])*40) ;
+            drawElements(ctx, grid, roverSet, roverJourneyStep) ;
+            roverJourneyStep.maxStep = getLongestCommandSet(roverSet) ;
+        }
+    } else {
+        window.alert("All field must be filled in order to create a rover") ;
+    }
+
 }
 
-function chooseScenario3() {
-    clearInterval(interval) ;
-    scenario2(roverJourneyStep, roverSet, grid) ;
-    drawGrid(ctx,(grid.size[0])*40,(grid.size[1])*40) ;
-    drawElements(ctx, grid, roverSet, roverJourneyStep) ;
-} 
-
 function clearScenario() {
+    // use to clear all creation and be able to recreate scenario from a white page
     clearObject(roverJourneyStep, roverSet, grid) ;
     drawElements(ctx, grid, roverSet, roverJourneyStep) ;
 }
 
-function launchScenario() {
+    /*  Launching creation function 
+    
+        The previous function intialized various scenarios, The function launch scenario from one 
+        of the previous initalization
+    */
+
+   function launchScenario() {
     console.log(grid) ;
     console.log(roverJourneyStep) ;
     console.log(roverSet);
-    interval=setInterval( function() { roverJourney(ctx, grid, roverSet,roverJourneyStep) ;}, 1000);
+    interval=setInterval( function() { roverJourney(ctx, grid, roverSet,roverJourneyStep, interval) ;}, 1000);
 }
+
+
+/*  Main 
+
+    In this part, we initialize principal object (grid, rovers) which will be modify by previous function.
+    When a user connect to the browser : all thoses objects are already download with a default setting. Then, 
+    using the interface, it can choose one scenario. Choosing a scenario means setting grid and rover set value, 
+    then launch the rovers trip
+*/
+
+
+const canvas = document.getElementById("myCanvas");
+const ctx = canvas.getContext("2d");
+    // get canvas element from html
+
+const angle = Math.PI/2 ;
+    // use a minimal value for turning a rover
+
+const obstacleSprite = document.getElementById("obstacle");
+const roverSprite = document.getElementById("rocket");
+    // get obstacle and rever sprite to draw them
+
+const roverJourneyStep = {
+    step: 0,
+    maxStep: 1
+} ;
+    // It descrive the step of a rover trip : step indicate what instant we are in the trip,
+    // and maxStep the end of the trip. Most of the time, maxStep is the longuest command set 
+    // among all the rover
+
+const roverSet = [] ;
+    // initialy, there is no rover
+const grid = constructGrid([10,10], constructObstacleSet([]));
+    // initialy, the grid is a 10-10 grid whit no obstacle
+
+let interval;
+
+
+
+
+
+
+
+
 
 
 

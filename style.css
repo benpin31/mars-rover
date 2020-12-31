@@ -9,6 +9,8 @@ h1 {
   font-size: 2em;
   text-align: center;
   text-transform: uppercase;
+  margin-bottom: 0px;
+  padding: 0;
 }
 
 #interface {
@@ -42,7 +44,7 @@ h1 {
 
 #control-bar article {
   width : auto;
-  padding: 5%;
+  padding: 0 5px;
 }
 
 
