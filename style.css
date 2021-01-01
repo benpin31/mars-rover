@@ -3,6 +3,8 @@
 body {
   font-family: Roboto;
   font-size: 10px;
+  width: 1351px;
+  height:760px;
 }
 
 h1 {
@@ -15,7 +17,7 @@ h1 {
 
 #interface {
   display:flex;
-  height: 100vh;
+    height:760px;
   background-image: url("https://www.dropbox.com/s/bpve4k1yn0fbodf/Mars.jpg?raw=1");
   background-size: cover;
 }
@@ -29,7 +31,7 @@ h1 {
   justify-content: space-around;
 }
 
-#control-bar .scenario {
+#control-bar .exploration {
   width: 80%;
   background-color: rgba(255, 255, 255, 0.1);
   color:white;

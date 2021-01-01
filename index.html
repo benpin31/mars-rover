@@ -10,31 +10,41 @@
 <body>
     <div id="interface">
         <div id="control-bar">
-            <div class="scenario">
+            <div class="exploration">
                 <h1>Crash on a volcano</h1>
                 <article>
-                    <p>In this scenario : One volcano between, 9 rovers which rush over it. What will happen ? (worst synpsis ever :o)</p>
+                    <p>In this exploration : One volcano between, 9 rovers which rush over it. Meanwhile,
+                        Other rovers risk collision : What will happen ? (worst synpsis ever :o). 
+                        Press the "Prepare exploration" to initialize the exploration trip and "Launch exploration" to launch it. 
+                        Get detailed moves in console.
+                    </p>
                 </article>
                 <div class="user-action">
-                    <input class="button" type="button" value="Prepare scenario" onclick="chooseScenario1();" />
-                    <input class="button" type="button" value="Launch scenario" onclick="launchScenario();" />    
+                    <input class="button" type="button" value="Prepare exploration" onclick="chooseExploration1();" />
+                    <input class="button" type="button" value="Launch exploration" onclick="launchExploration();" />    
                 </div>
             </div>
-            <div class="scenario">
-                <h1>Dance of the rover</h1>
+            <div class="exploration">
+                <h1>Dance of the rovers</h1>
                 <article>
-                    <p>Six rovers dance around 4 volcanos. They all make a complete tour then move away the center.</p>
+                    <p>Six rovers dance around 4 volcanos. They all make a complete tour then move away the center.
+                        Press the "Prepare exploration" to initialize the exploration trip and "Launch exploration" to launch it.                         
+                        Get detailed moves in console.
+                    </p>
                 </article>
                 <div class="user-action">
-                    <input class="button" type="button" value="Prepare scenario" onclick="chooseScenario2();" />
-                    <input class="button" type="button" value="Launch scenario" onclick="launchScenario();" />    
+                    <input class="button" type="button" value="Prepare exploration" onclick="chooseExploration2();" />
+                    <input class="button" type="button" value="Launch exploration" onclick="launchExploration();" />    
                 </div>
             </div>
-            <div class="scenario">
-                <h1>Your own scenario ! </h1>
+            <div class="exploration">
+                <h1>Your own exploration ! </h1>
                 <article>
-                    <p>You can create your own scenario : choose grid size, obstacle and rover position. Be carrefull : 
-                        two disctinct elements can't have the same position or the same name</p>
+                    <p>You can create your own exploration : choose grid size, obstacle and rover position. 
+                        Always press "Clear exploration" if you want to create a new exploration, otherwise, 
+                        previous parameters will still be in memory. Press "Launch exploration" to launch your exploration.
+                        Get detailed moves in console.
+                    </p>
                 </article>
                 <div id="user-choice">
                     <div class="slot-form-container">
@@ -47,8 +57,8 @@
                     </div>
                     <div class="slot-form-container">
                         <label for="Obstacle-position-1"> Obstacle position :</label>
-                        <input type="number" id="Obstacle-position-1" placeholder="obstacle row number">
-                        <input type="number" id="Obstacle-position-2" placeholder="obstacle col number">
+                        <input type="number" id="Obstacle-position-1" placeholder="Obstacle row">
+                        <input type="number" id="Obstacle-position-2" placeholder="Obstacle column">
                     </div>
                     <div class="slot-form-container-button">
                         <input class="button" type="button" value="Add an obstacle !" class="submit-button" onclick = "addObstacle()">
@@ -60,13 +70,13 @@
                     </div>
                     <div class="slot-form-container">
                             <label for="rover-direction"> Rover direction :</label>
-                            <input type="text" id="rover-direction" placeholder="Rover Direction">
+                            <input type="text" id="rover-direction" placeholder="N/S/E/O">
                             <div class="empty"><p></p></div> 
                     </div>
                     <div class="slot-form-container">   
                         <label for="rover-position-1"> Rover position :</label>
-                        <input type="number" id="rover-position-1" placeholder="Rover row number">
-                        <input type="number" id="rover-position-2" placeholder="Rover col number">
+                        <input type="number" id="rover-position-1" placeholder="Rover row">
+                        <input type="number" id="rover-position-2" placeholder="Rover column">
                     </div>
                     <div class="slot-form-container">
                         <label for="rover-command"> Rover command set :</label>
@@ -78,8 +88,8 @@
                     </div>
                 </div>
                 <div class="user-action">
-                    <input class="button" type="button" value="Clear scenario" onclick="clearScenario();" />
-                    <input class="button" type="button" value="Launch scenario" onclick="launchScenario();" />    
+                    <input class="button" type="button" value="Clear exploration" onclick="clearExploration();" />
+                    <input class="button" type="button" value="Launch exploration" onclick="launchExploration();" />    
                 </div>
             </div>
         </div>
