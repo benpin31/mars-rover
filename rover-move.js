@@ -154,7 +154,7 @@ function clearObject(roverJourneyStep, roverSet, grid) {
         This part gather functions which give potiential move, without taking into account the obstacles
     */
 
-const directionList = ['N', 'E', 'S', 'O'] ;
+const directionList = ['N', 'E', 'S', 'W'] ;
    /*  constant used in function turnRover. turning right(left) constists in moving right(left) 
        in this array with loop when we are at the begining or at the end
    */
@@ -195,7 +195,7 @@ function potentialMoveBackwardForwardRover(rover, moveType) {
         case 'E': 
             nextPosition = [rover.position[0], rover.position[1] + toAdd];
             break;
-        case 'O': 
+        case 'W': 
             nextPosition = [rover.position[0], rover.position[1] - toAdd];
             break;
         default:
@@ -463,7 +463,7 @@ function drawElements(ctx, grid, roverSet) {
         case 'E':
             drawImage(ctx,roverSprite, positionCol, positionRow , unity.unity, unity.unity, Math.PI/2);            
             break ;
-        case 'O':
+        case 'W':
             drawImage(ctx,roverSprite, positionCol, positionRow , unity.unity, unity.unity, -Math.PI/2);            
             break ;
         }
@@ -546,8 +546,8 @@ function exploration1(roverJourneyStep, roverSet, grid) {
 
     let rover1 = constructRover('R1', 'E', [8,2], 'ffffff') ;
     let rover2 = constructRover('R2', 'E', [8,1], 'ffffff') ;
-    let rover3 = constructRover('R3', 'O', [8,14], 'ffffff') ;
-    let rover4 = constructRover('R4', 'O', [8,15], 'ffffff') ;
+    let rover3 = constructRover('R3', 'W', [8,14], 'ffffff') ;
+    let rover4 = constructRover('R4', 'W', [8,15], 'ffffff') ;
     let rover5 = constructRover('R5', 'N', [2,8], 'ffffff') ;
     let rover6 = constructRover('R6', 'N', [1,8], 'ffffff') ;
     let rover7 = constructRover('R7', 'S', [14,8], 'ffffff') ;
@@ -603,8 +603,8 @@ function exploration2(roverJourneyStep, roverSet, grid) {
     let rover1 = constructRover('R1', 'E', [4,5], command1) ;
     let rover2 = constructRover('R2', 'E', [4,7], command2) ;
     let rover3 = constructRover('R3', 'N', [6,7], command3) ;
-    let rover4 = constructRover('R4', 'O', [7,6], command1) ;
-    let rover5 = constructRover('R5', 'O', [7,4], command2) ;
+    let rover4 = constructRover('R4', 'W', [7,6], command1) ;
+    let rover5 = constructRover('R5', 'W', [7,4], command2) ;
     let rover6 = constructRover('R6', 'S', [5,4], command3) ;
     
     roverSet.push(rover1, rover2,rover3,rover4,rover5,rover6) ;

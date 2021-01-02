@@ -13,8 +13,8 @@
             <div class="exploration">
                 <h1>Crash on a volcano</h1>
                 <article>
-                    <p>In this exploration : One volcano between, 9 rovers which rush over it. Meanwhile,
-                        Other rovers risk collision : What will happen ? (worst synpsis ever :o). </p>
+                    <p>One volcano in the center, 9 rovers which rush over it. Meanwhile,
+                        other rovers risk collision : What will happen ? (worst synopsis ever :o). </p>
                      <p>Press the "Prepare exploration" to initialize the exploration trip and "Launch exploration" to launch it. 
                         Get detailed moves in console.
                     </p>
@@ -49,39 +49,39 @@
                 <div id="user-choice">
                     <div class="slot-form-container">
                         <label for="grid-size-1"> Grid size :</label>
-                        <input type="number" id="grid-size-1" placeholder="Number of row">
-                        <input type="number" id="grid-size-2" placeholder="Number of col">
+                        <input type="number" id="grid-size-1" class="user-entry" placeholder="Number of rows">
+                        <input type="number" id="grid-size-2" class="user-entry" placeholder="Number of columns">
                     </div>
                     <div class="slot-form-container-button">
                         <input class="button" type="button" value="Create Grid !" class="submit-button" onclick = "createGrid()">
                     </div>
                     <div class="slot-form-container">
                         <label for="Obstacle-position-1"> Obstacle position :</label>
-                        <input type="number" id="Obstacle-position-1" placeholder="Obstacle row">
-                        <input type="number" id="Obstacle-position-2" placeholder="Obstacle column">
+                        <input type="number" id="Obstacle-position-1" class="user-entry" placeholder="Obstacle row">
+                        <input type="number" id="Obstacle-position-2" class="user-entry" placeholder="Obstacle column">
                     </div>
                     <div class="slot-form-container-button">
-                        <input class="button" type="button" value="Add an obstacle !" class="submit-button" onclick = "addObstacle()">
+                        <input class="button" type="button"  value="Add an obstacle !" class="submit-button" onclick = "addObstacle()">
                     </div>
                     <div class="slot-form-container">
                         <label for="rover-name"> Rover Name :</label>
-                        <input type="text" id="rover-name" placeholder="Rover name">
+                        <input type="text" id="rover-name" class="user-entry" placeholder="Rover name">
                         <div class="empty"><p></p></div> 
                     </div>
                     <div class="slot-form-container">
                             <label for="rover-direction"> Rover direction :</label>
-                            <input type="text" id="rover-direction" placeholder="N/S/E/O">
+                            <input type="text" id="rover-direction" class="user-entry" placeholder="N/S/E/W">
                             <div class="empty"><p></p></div> 
                     </div>
                     <div class="slot-form-container">   
                         <label for="rover-position-1"> Rover position :</label>
-                        <input type="number" id="rover-position-1" placeholder="Rover row">
-                        <input type="number" id="rover-position-2" placeholder="Rover column">
+                        <input type="number" id="rover-position-1" class="user-entry" placeholder="Rover row">
+                        <input type="number" id="rover-position-2" class="user-entry" placeholder="Rover column">
                     </div>
                     <div class="slot-form-container">
                         <label for="rover-command"> Rover command set :</label>
-                        <input type="text" id="rover-command" placeholder="Rover command set">
-                        <div class="empty"><p></p></div> 
+                        <input type="text" id="rover-command" placeholder="l(eft) / r(ight) / f(orward) / b(ackward). ex : llffbrff">
+                        <!--<div class="empty"><p></p></div>--> 
                     </div>
                     <div class="slot-form-container-button">
                         <input class="button" type="button" value="Add a rover !" class="submit-button" onclick = "addRover()">
