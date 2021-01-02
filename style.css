@@ -2,29 +2,29 @@
 
 body {
   font-family: Roboto;
-  font-size: 10px;
-  width: 1351px;
-  height:760px;
+  font-size: 1.3vh;
 }
 
 h1 {
   font-size: 2em;
   text-align: center;
   text-transform: uppercase;
-  margin-bottom: 0px;
+  margin-bottom: 0;
   padding: 0;
 }
 
 #interface {
   display:flex;
-    height:760px;
+  width: auto;
+  min-height: 100vh;
   background-image: url("https://www.dropbox.com/s/bpve4k1yn0fbodf/Mars.jpg?raw=1");
   background-size: cover;
 }
 
 #control-bar {
   background-color: #000000b0 ;
-  width: 600px;
+  max-width: 40em;
+  min-width: 40em;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -41,12 +41,13 @@ h1 {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  margin-bottom: 5px;
+  margin-bottom: 0.4em;
 }
 
 #control-bar article {
   width : auto;
-  padding: 0 5px;
+  padding: 0 1em;
+  text-align: justify;
 }
 
 
@@ -54,11 +55,11 @@ h1 {
   background-color: black;
   border: 1px solid white;
   color:white ;
-  height: 25px;
+  height: 2.5em;
   outline: none;
-  padding: 3px;
-  margin: 3px;
-  width: 120px;
+  padding: 0.3em;
+  margin: 0.3em;
+  width: 14em;
   font-size: 1em;
   
 }
@@ -70,14 +71,20 @@ h1 {
 }
 
 #user-choice .slot-form-container input{
-  width: 100px;
-  font-size: 1em;
-  margin: 5px;
+  width: 11.4em;
+  height: 2.5em;
+  font-size: 0.8em;
+  padding:  0 0.3em;
+  border: 0;
+  margin: 0.3em 0;
 }
 
 .empty >p {
-  width: 100px;
-  margin: 8px;
+  width: 12em;
+  height:20px;
+  font-size: 0.8em;
+  padding: 0px;
+  margin: 0px;
 }
 
 #user-choice .slot-form-container label {
@@ -86,8 +93,8 @@ h1 {
 
 #user-choice .slot-form-container-button {
   display: flex;
-  justify-content: space-around;
-  margin-bottom: 5px;
+  justify-content: flex-end;
+  margin: 2px 0;
 }
 
 #movie { 

@@ -444,27 +444,27 @@ function drawElements(ctx, grid, roverSet) {
 
     grid.obstacleSet.forEach(obstacle => {
         if (obstacle.type === 'obstacle') {
-            positionRow = (grid.size[0] - obstacle.position[0])*40 ;
-            positionCol = (obstacle.position[1]-1)*40 ;
-            drawImage(ctx,obstacleSprite,positionCol, positionRow, 40,40, 0);
+            positionRow = (grid.size[0] - obstacle.position[0])*unity.unity ;
+            positionCol = (obstacle.position[1]-1)*unity.unity ;
+            drawImage(ctx,obstacleSprite,positionCol, positionRow, unity.unity,unity.unity, 0);
         }
     }) ;
 
     roverSet.forEach(rover => {
-        positionRow = (grid.size[0] - rover.position[0])*40 ;
-        positionCol = (rover.position[1]-1)*40 ;
+        positionRow = (grid.size[0] - rover.position[0])*unity.unity ;
+        positionCol = (rover.position[1]-1)*unity.unity ;
         switch(rover.direction) {
         case 'N':
-            drawImage(ctx,roverSprite, positionCol, positionRow , 40, 40, 0);            
+            drawImage(ctx,roverSprite, positionCol, positionRow , unity.unity, unity.unity, 0);            
             break ;
         case 'S':
-            drawImage(ctx,roverSprite, positionCol, positionRow , 40, 40, Math.PI);            
+            drawImage(ctx,roverSprite, positionCol, positionRow , unity.unity, unity.unity, Math.PI);            
             break ;
         case 'E':
-            drawImage(ctx,roverSprite, positionCol, positionRow , 40, 40, Math.PI/2);            
+            drawImage(ctx,roverSprite, positionCol, positionRow , unity.unity, unity.unity, Math.PI/2);            
             break ;
         case 'O':
-            drawImage(ctx,roverSprite, positionCol, positionRow , 40, 40, -Math.PI/2);            
+            drawImage(ctx,roverSprite, positionCol, positionRow , unity.unity, unity.unity, -Math.PI/2);            
             break ;
         }
         ctx.fillStyle  = "white";
@@ -572,7 +572,7 @@ function chooseExploration1() {
     // Called when a user choose exploration 1. It initialize object position for this scenario
     clearInterval(interval) ;
     exploration1(roverJourneyStep, roverSet, grid) ;
-    drawGrid(ctx,(grid.size[0])*40,(grid.size[1])*40) ;
+    drawGrid(ctx,(grid.size[0])*unity.unity,(grid.size[1])*unity.unity) ;
     drawElements(ctx, grid, roverSet, roverJourneyStep) ;
 } 
 
@@ -619,7 +619,7 @@ function chooseExploration2() {
     // Called when a user choose exploration 2. It initialize object position for this scenario
     clearInterval(interval) ;
     exploration2(roverJourneyStep, roverSet, grid) ;
-    drawGrid(ctx,(grid.size[0])*40,(grid.size[1])*40) ;
+    drawGrid(ctx,(grid.size[0])*unity.unity,(grid.size[1])*unity.unity) ;
     drawElements(ctx, grid, roverSet, roverJourneyStep) ;
 } 
 
@@ -638,7 +638,7 @@ function createGrid() {
     } else {
         window.alert("Some field are empty : default grid (10-10) is constructed") ;
     }
-    drawGrid(ctx,(grid.size[0])*40,(grid.size[1])*40) ;
+    drawGrid(ctx,(grid.size[0])*unity.unity,(grid.size[1])*unity.unity) ;
 } 
 
 function aRoverHasTheSameName(newRover, roverSet) {
@@ -734,7 +734,7 @@ function addRover() {
             window.alert("You can't create a rover with the same position than an obstacle") ;
         } else {
             roverSet.push(newRover) ;
-            drawGrid(ctx,(grid.size[0])*40,(grid.size[1])*40) ;
+            drawGrid(ctx,(grid.size[0])*unity.unity,(grid.size[1])*unity.unity) ;
             drawElements(ctx, grid, roverSet, roverJourneyStep) ;
             roverJourneyStep.maxStep = getLongestCommandSet(roverSet) ;
         }
@@ -769,6 +769,8 @@ function launchExploration() {
     then launch the rovers trip
 */
 
+const unity={unity:document.body.clientHeight/20} ;
+    // unity for drawing, 1 unity = size of one cell in the grid
 
 const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
@@ -792,6 +794,27 @@ const grid = constructGrid([10,10], constructObstacleSet([]));
     // initialy, the grid is a 10-10 grid whit no obstacle
 
 let interval;
+
+/*  refresh function 
+
+    use when the usermodify browser size*/
+
+function getUnity() {
+    
+    let windoSize = document.body.clientHeight;
+    unity.unity = windoSize/20;
+    // modify unity dfor drawing
+
+    let ControleBarWidth = document.getElementById("control-bar").offsetWidth;
+    document.getElementById("interface").style.minWidth = (grid.size[0]*unity.unity + ControleBarWidth) + "px" ;
+    // minimal width of interface become the size of the control bar + the size of the grid
+
+    drawGrid(ctx,(grid.size[0])*unity.unity,(grid.size[1])*unity.unity) ;
+    drawElements(ctx, grid, roverSet, roverJourneyStep) ;
+}
+
+window.onload = getUnity;
+window.onresize = getUnity;
 
 
 
