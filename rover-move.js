@@ -746,6 +746,7 @@ function addRover() {
 
 function clearExploration() {
     // use to clear all creatiosn and be able to recreate exploration from a white page
+    clearInterval(interval) ;
     clearObject(roverJourneyStep, roverSet, grid) ;
     drawElements(ctx, grid, roverSet, roverJourneyStep) ;
 }
@@ -757,6 +758,7 @@ function clearExploration() {
     */
 
 function launchExploration() {
+    clearInterval(interval) ;
     interval=setInterval( function() { roverJourney(ctx, grid, roverSet,roverJourneyStep, interval) ;}, 1000);
 }
 
@@ -780,7 +782,7 @@ const angle = Math.PI/2 ;
     // use a minimal value for turning a rover
 
 const obstacleSprite = document.getElementById("obstacle");
-const roverSprite = document.getElementById("rocket");
+const roverSprite = document.getElementById("rover");
     // get obstacle and rever sprite to draw them
 
 const roverJourneyStep = constructRoverJourneyStep() ; 
